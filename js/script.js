@@ -3,28 +3,6 @@ import eMaiorDeIdade from "./validaIdade.js";
 
 const camposDoFormulario = document.querySelectorAll("[required]");
 
-function verificaCampo(campo) {
-
-    if (campo.name == "cpf" && campo.value.length >= 11) {
-        eUmCPF(campo);
-    }
-
-    if (campo.name == "aniversario" && campo.value != "") {
-        eMaiorDeIdade(campo);
-    }
-
-    console.log(campo.validity);
-
-};
-
-camposDoFormulario.forEach((campo) => {
-
-    campo.addEventListener("blur", () => verificaCampo(campo));
-
-    campo.addEventListener("invalid", evento => evento.preventDefault())
-
-});
-
 const tiposDeErros = [
     "valueMissing",
     "typeMismatch",
@@ -65,3 +43,47 @@ const mensagens = {
     }
     
 }
+
+function verificaCampo(campo) {
+
+    let mensagem = "";
+
+    campo.setCustomValidity("");
+
+    if (campo.name == "cpf" && campo.value.length >= 11) {
+        eUmCPF(campo);
+    }
+
+    if (campo.name == "aniversario" && campo.value != "") {
+        eMaiorDeIdade(campo);
+    }
+
+    tiposDeErros.forEach(erro => {
+
+        if (campo.validity[erro]) {
+            mensagem = mensagens[campo.name][erro];
+        }
+
+        console.log(mensagem);
+
+    })
+
+    const mensagemErro = campo.parentNode.querySelector(".mensagem-erro");
+    const validadorDeInput = campo.checkValidity();
+
+    if (!validadorDeInput) {
+        mensagemErro.textContent = mensagem;
+    } else {
+        mensagemErro.textContent = "";
+    }
+
+};
+
+camposDoFormulario.forEach((campo) => {
+
+    campo.addEventListener("blur", () => verificaCampo(campo));
+
+    campo.addEventListener("invalid", evento => evento.preventDefault())
+
+});
+
